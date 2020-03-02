@@ -163,7 +163,7 @@ class Run(object):
 
 if __name__ == "__main__":
     # 打开文件
-    file = Bin(r'C:\Users\tomat\Desktop\Camel\test\app1.bin')
+    file = Bin(r'C:\Users\tomat\Desktop\Camel\test\app1.bin', 0x4000)
     # 填充0xFF
     file.fill_bytes()
     # 写入包长字节到偏移0x08
@@ -176,4 +176,5 @@ if __name__ == "__main__":
     file.crc32_update_revtab(offset=0x00, start=0x04)
     # 保存
     file.save(r"C:\Users\tomat\Desktop\1.bin")
-
+    new_o = file + Bin(bytearray([0xaa]*10), 0xC000)
+    new_o.save(r"C:\Users\tomat\Desktop\2.bin")

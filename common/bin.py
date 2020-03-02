@@ -8,10 +8,25 @@ from cryptography.hazmat.backends import default_backend
 
 
 class Bin:
-    def __init__(self, f):
-        info(f"Open file {f}")
-        self.source = bytes(open(f, 'rb').read())
+    def __init__(self, f, offset):
+        if isinstance(f, bytearray) is False and isinstance(f, bytes) is False:
+            info(f"Open file {f}")
+            self.source = bytearray(open(f, 'rb').read())
+        else:
+            self.source = bytearray(f)
         self.content = bytearray(self.source)
+        self.offset = offset
+
+    def __add__(self, other):
+        new_obj = None
+        if self.offset < other.offset and self.offset + len(self.content) <= other.offset:
+            new_obj = Bin(self.content + bytearray([0xFF]*(other.offset - len(self.content))) + other.content, self.offset)
+        elif other.offset < self.offset and other.offset + len(other.content) <= self.offset:
+            new_obj = Bin(other.content + bytearray([0xFF] * (self.offset - len(other.content))) + self.content, other.offset)
+        else:
+            error("Wrong offset")
+        return new_obj
+
 
     def reset(self):
         """
