@@ -1,0 +1,30 @@
+config:
+  # 编译器, 可选 IAR, GCC
+  compiler: IAR
+
+IAR:
+  # IAR 版本
+  # 可选: 7.40, 8.20, 8.30
+  IAR_ver: 8.20
+  # IAR 项目路径, xxx.ewp文件所处位置
+  IAR_prj_path: E:\OnePiece\Project\0007.KFM\Camel_01_KF13A017_DC_PP\Prj_IAR
+  # 编译工程, 对应xxx.ewp : 工程名
+  compile_prj: {
+      'boot': ['Debug'],
+      'app1': ['Legal-100A-DC', 'Legal-160A-DC', 'Legal-PPCT-CT', 'Legal-CTVT-CT'],
+      'app2': ['App-100A-DC', 'App-160A-DC', 'App-PPCT-CT', 'App-CTVT-CT']
+  }
+  # 烧录包组成
+  firmware: {
+      #            boot         app1             app2
+      '100A-DC': ['Debug', 'Legal-100A-DC', 'App-100A-DC'],
+      '160A-DC': ['Debug', 'Legal-160A-DC', 'App-160A-DC'],
+      'PPCT-CT': ['Debug', 'Legal-PPCT-CT', 'App-PPCT-CT'],
+      'CTVT-CT': ['Debug', 'Legal-CTVT-CT', 'App-CTVT-CT']
+  }
+  # 分区起始地址
+  offset: {
+      'boot': 0x00000000,
+      'app1': 0x00003000,
+      'app2': 0x0000C000
+  }
