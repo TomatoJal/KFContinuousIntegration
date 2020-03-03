@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
-from common.common import *
-from common.algorithm import *
+from pack.algorithm import *
 from common.log import *
 # 第三方算法库
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from struct import *
 
 
 class Bin:
@@ -20,20 +20,24 @@ class Bin:
     def __add__(self, other):
         new_obj = None
         if self.offset < other.offset and self.offset + len(self.content) <= other.offset:
-            new_obj = Bin(self.content + bytearray([0xFF]*(other.offset - len(self.content))) + other.content, self.offset)
+            new_obj = Bin(self.content + bytearray([0xFF] * (other.offset - len(self.content))) + other.content,
+                          self.offset)
         elif other.offset < self.offset and other.offset + len(other.content) <= self.offset:
-            new_obj = Bin(other.content + bytearray([0xFF] * (self.offset - len(other.content))) + self.content, other.offset)
+            new_obj = Bin(other.content + bytearray([0xFF] * (self.offset - len(other.content))) + self.content,
+                          other.offset)
         else:
             error("Wrong offset")
         return new_obj
-
 
     def reset(self):
         """
         还原content: content = src_content
         :return: None
         """
-        self.content = self.source
+        self.content = bytearray(self.source)
+
+    def update(self):
+        self.source = bytearray(self.content)
 
     def del_end_ff(self, alignment=4):
         """
@@ -41,7 +45,11 @@ class Bin:
         :param alignment: 对齐字节，一般芯片都为4字节对齐
         :return: None
         """
-        self.content = del_end_ff(self.content, alignment)
+        i = 0
+        for i in reversed(range(0, len(self.content))):
+            if self.content[i] != 0xFF:
+                break
+        return self.content[:i + alignment - i % alignment]
 
     def save(self, path):
         info(f"Save to {path}")
@@ -64,7 +72,7 @@ class Bin:
         else:
             error("Unknown end")
             return
-        info(f"Fill 0xFF until {len(self.content) + fill_length}")
+        info(f"Fill 0xFF until {hex(len(self.content) + fill_length)}")
         self.content += bytearray([0xff] * fill_length)
 
     def write_length_bytes(self, offset, start=0, bytes_length=4, cover=True):
@@ -94,7 +102,7 @@ class Bin:
         :param cover: True-覆盖 False-插入
         :return: None
         """
-        info(f"Calculate CRC32 and write to {hex(offset)} from {hex(start)}")
+        info(f"Calculate CRC32 from {hex(start)} and write to {hex(offset)}")
         crc = crc32_update_revtab(self.content[start:])
         if cover is True:
             for i in range(0, 4):
@@ -105,6 +113,7 @@ class Bin:
             error("The length of bin is not the multiples of 16")
             return
         info(f"Encrypt with AES ECB from {hex(start)}")
+        info(f"The key is {key}")
         encryptor = Cipher(
             algorithms.AES(bytes.fromhex(key)),
             modes.ECB(),
@@ -116,6 +125,47 @@ class Bin:
             self.content[start + 16*i: start + 16*(i+1)] = \
                 encryptor.update(self.content[start + 16*i: start + 16*(i+1)])
 
+    def bin2hex(self, path):
+        fhex = open(path, 'w')
+        offset = 0
+        seg_addr = 0
+        for i in range(0, int(len(self.content)/16)):
+            checksum = 0
+            result = ':'
+            bindata = self.content[i*16: (i+1)*16]
+            result += '%02X' % len(bindata)
+            result += '%04X' % offset
+            result += '00'
+            checksum = len(bindata)
+            checksum += (offset & 0xff) + (offset >> 8)
+
+            for j in range(0, len(bindata)):
+                byte = unpack('B', bytes([bindata[j]]))
+                result += '%02X' % byte
+                checksum += byte[0]
+
+            checksum = 0x01 + ~checksum
+            checksum = checksum & 0xff
+            result += '%02X\n' % checksum
+            fhex.write(result)
+            offset += len(bindata)
+            if offset == 0x10000:
+                offset = 0
+                seg_addr += 1
+                result = ':02000004'
+                result += '%02X%02X' % ((seg_addr >> 8) & 0xff, seg_addr & 0xff)
+                checksum = 0x02 + 0x04 + (seg_addr >> 8) + seg_addr & 0xff
+                checksum = -checksum
+                result += '%02X' % (checksum & 0xff)
+                result += '\n'
+                fhex.write(result)
+            # end if
+            if len(bindata) < 0x10:
+                break
+        # end if
+        # end while
+        fhex.write(':00000001FF')
+        fhex.close()
 
 
 

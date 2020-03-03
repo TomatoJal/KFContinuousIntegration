@@ -1,180 +1,106 @@
 # -*- coding: UTF-8 -*-
 import argparse
-from common import *
-
-class Run(object):
-
-    def __init__(self, args):
-        self.args = args
-        self.testCaseStatus = dict()
-        self.main()
+from compiler import *
+from pack import *
+import yaml
+import os
+import shutil
 
 
-    # def searchAndRunTestCase(self):
-    #     """
-    #     根据 tag 和 untag 提取用例并执行
-    #     :return:
-    #     """
-    #     # 将特殊 tag 添加到集合中
-    #     self.args.tag = addSpecialTag(self.args.tag.split(","))
-    #
-    #     # 遍历模块下所有以".py"结尾的文件
-    #     testcasedir = "projects" + os.sep + self.args.project.lower() + os.sep + self.args.feature.lower()
-    #     if not os.path.exists(testcasedir):
-    #         parser.error(f"Not found TestCaseDir: '{testcasedir}'")
-    #         exit(-1)
-    #
-    #
-    #     # 检查是否存在项目级的setup.py文件 (用于项目初始化操作)
-    #     result = setupTearDown(project=self.args.project.lower(), feature="", isSetup=True)
-    #     if result != 0:
-    #         return
-    #
-    #     # 检查是否存在模块级的setup.py文件 (用于模块初始化操作)
-    #     result = setupTearDown(project=self.args.project.lower(), feature=self.args.feature.lower(), isSetup=True)
-    #     if result != 0:
-    #         return
-    #
-    #     info("-------------------------- Test Start --------------------------")
-    #     testResultList = list()
-    #     for root, dirs, files in os.walk(testcasedir):
-    #         for f in files:
-    #             if f.endswith(".py") and f not in ['var.py', 'comm.py', 'setup.py', 'teardown.py']:
-    #                 result = isContainTags(os.path.join(root, f), args.tag, args.untag)
-    #                 if result[0]:
-    #                     testResult = execTestcase(result[1])
-    #                     if testResult is not None:
-    #                         self.testCaseStatus[testResult[0]] = testResult[1]
-    #                         if testResult[1] == 0:
-    #                             content = f'{testResult[0].__doc__.strip()} *** succeeded! ***'
-    #                             info(content)
-    #                         else:
-    #                             content = f'{testResult[0].__doc__.strip()} *** failed! ***'
-    #                             error(content)
-    #                             # 首次执行失败的也记录到'result.txt', 以备查看
-    #                             writeTestResultToFile(content)
-    #                         testResultList.append(testResult)
-    #
-    #
-    #     # 检查是否存在模块级的teardown.py文件 (用于模块恢复设置操作)
-    #     result = setupTearDown(project=self.args.project.lower(), feature=self.args.feature.lower(), isSetup=False)
-    #     if result != 0:
-    #         return
-    #
-    #     # 检查是否存在项目级的teardown.py文件 (用于项目恢复设置操作)
-    #     result = setupTearDown(project=self.args.project.lower(), feature="", isSetup=False)
-    #     if result != 0:
-    #         return
-    #
-    #     info('')
-    #     info("-------------------------- Test Result --------------------------")
-    #     for testResult in testResultList:
-    #         if testResult[1] == 0:
-    #             info(f'{testResult[0].__doc__.strip()} *** succeeded! ***')
-    #         else:
-    #             error(f'{testResult[0].__doc__.strip()} *** failed! ***')
-    #     info('');info('')
-    #
-    #
-    # def reRunFailedTestCases(self):
-    #     """
-    #     将失败的用例重新执行一次
-    #     :param args:
-    #     :return:
-    #     """
-    #     filename = os.path.abspath(os.path.join("logs", kfLog.datetime, 'result.txt'))
-    #     try:
-    #         with open(filename, 'r') as fp:
-    #             content = fp.read()
-    #     except FileNotFoundError as ex:
-    #         error(ex)
-    #         exc_type, exc_value, exc_traceback_obj = sys.exc_info()
-    #         error("".join(traceback.format_exception(exc_type, exc_value, exc_traceback_obj)))
-    #         return
-    #
-    #     # 修改 tag 后, 重新执行
-    #     arglist = list(set(re.findall('TestCase:\s*(.*)\.py.*\*\*\* failed! \*\*\*', content)))
-    #     if len(arglist) > 0:
-    #         for index, item in enumerate(arglist):
-    #             # 查找同一子模块中是否存在以'000'命名的特殊脚本 (要求: 脚本文件名最后一段必须是三个数值)
-    #             initialFile = re.sub(r'_(\d{3})', '_000', item)
-    #             if initialFile not in arglist:
-    #                 arglist.insert(index, initialFile)
-    #
-    #         self.args.tag = ",".join(arglist)
-    #         self.args.rerun = 0
-    #         self.searchAndRunTestCase()
-    #
-    #
-    # def main(self):
-    #
-    #     # 查找用例并执行
-    #     self.searchAndRunTestCase()
-    #
-    #     # 执行失败的用例
-    #     # for i in range(args.rerun):
-    #     if int(args.rerun) != 0:
-    #         self.reRunFailedTestCases()
-    #
-    #     content = "-------------------------- Final Result --------------------------"
-    #     info(''); info(content); writeTestResultToFile(content)
-    #     ok = nok = 0
-    #     for func, status in self.testCaseStatus.items():
-    #         if status == 0:
-    #             content = f'{func.__doc__.strip()} *** succeeded! ***'
-    #             info(content)
-    #             ok += 1
-    #             writeTestResultToFile(content)
-    #         else:
-    #             content = f'{func.__doc__.strip()} *** failed! ***'
-    #             error(content)
-    #             nok += 1
-    #             writeTestResultToFile(content)
-    #
-    #     # 统计结果
-    #     content = "-------------------------- Statistic --------------------------"
-    #     info(content)
-    #     writeTestResultToFile(content)
-    #     content = f'Total Testcase: {ok+nok}; Succeed: {ok}; Failed: {nok}\n'
-    #     info(content)
-    #     writeTestResultToFile(content)
-    #
-    #
-    #     # 将Log转化成Html格式
-    #     logToHtml()
+class Project:
+
+    def __init__(self):
+        self.basic_info = {}
+        self.system_info = {}
+        self.project_info = {}
+        self.project_info.update({'bin': {}})
+        self.project = {}
+        self.pack_func = None
+
+    def search_project(self):
+        prj_dir = r'./project/' + self.basic_info['project_name']
+        if not os.path.exists(prj_dir):
+            parser.error(f"Not found TestCaseDir: '{prj_dir}'")
+            exit(-1)
+        self.basic_info['project_path'] = prj_dir
+
+        if self.basic_info['pack'] is True:
+            if not os.path.exists(f"{self.basic_info['project_path']}/pack.py"):
+                error(f"Not found the script: pack.py")
+                exit(-1)
+            obj = __import__(f"project.{self.basic_info['project_name']}.pack", fromlist=['all'])
+            self.pack_func = obj.pack
+
+    def main(self):
+        # 搜寻项目路径
+        self.search_project()
+
+        # 获取项目配置, 并编译
+        with open(self.basic_info['project_path'] + r'\config.yaml', encoding="utf-8") as f:
+            config = yaml.load(f, Loader=yaml.FullLoader)
+            if 'IAR' in config['config']['compiler']:
+                self.project_info['IAR'] = config['IAR']
+                for part in self.project_info['IAR']['compile_prj']:
+                    self.project[part] = {}
+                    self.project_info['bin'][part] = {}
+                    for prj in self.project_info['IAR']['compile_prj'][part]:
+                        self.project[part][prj] = IARComplier(
+                            self.system_info['IAR_path'][self.project_info['IAR']['IAR_ver']],
+                            self.project_info['IAR']['IAR_prj_path'], part, prj)
+                        if self.basic_info['build'] is True:
+                            if self.project[part][prj].build() == -1:
+                                exit(-1)
+
+                        self.project_info['bin'][part][self.project[part][prj].project_name] = Bin(
+                            self.project[part][prj].exe_file, self.project_info['IAR']['offset'][part])
+            # GCC
+            else:
+                pass
+
+
+        # 进行打包
+        if self.basic_info['pack'] is True:
+            self.pack_func(self.project_info)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Package tool")
+
+    # 项目选择相关参数
+    parser.add_argument("project", help="project name: such as amber51, camel...")
+    parser.add_argument("-b", "--build", action="store_true", help="need build?")
+    parser.add_argument("-p", "--pack", action="store_true", help="need pack?")
+    # 解析数据
+    args = parser.parse_args()
+
+    # 更新项目名称
+    if args.project is None:
+        parser.error("'project' argument is needed!")
+
+    # 清理临时文件夹
+    if os.path.exists('./temp') is True:
+        shutil.rmtree('./temp')
+    os.makedirs('./temp')
+
+    # 读取全局配置文集
+    with open(r'config\environment.yaml', encoding="utf-8") as f:
+        system_info = yaml.load(f, Loader=yaml.FullLoader)['environment']
+
+    # 创建项目对象
+    project = Project()
+    project.basic_info['project_name'] = args.project
+    project.basic_info['build'] = args.build
+    project.basic_info['pack'] = args.pack
+    project.system_info = system_info
+
+    info(f"Start project {project.basic_info['project_name']}")
+
+    try:
+        project.main()
+    finally:
+        info('End~~~~~~~~~~~~~~')
 
 
 
-# if __name__ == '__main__':
-#     parser = argparse.ArgumentParser(description="Package tool")
-#
-#     # 用例选择相关参数
-#     parser.add_argument("-p", "--project", type=str, help="project name: such as amber51, camel...")
-#
-#     # 解析数据
-#     args = parser.parse_args()
-#
-#     # 更新项目名称
-#     if args.project is None:
-#         parser.error("'project' argument is needed!")
-#
-#     # 执行
-#     Run(args)
 
-if __name__ == "__main__":
-    # 打开文件
-    file = Bin(r'C:\Users\tomat\Desktop\Camel\test\app1.bin', 0x4000)
-    # 填充0xFF
-    file.fill_bytes()
-    # 写入包长字节到偏移0x08
-    file.write_length_bytes(offset=0x08)
-    # 从0x0E开始计算CRC写入偏移0x04
-    file.crc32_update_revtab(offset=0x04, start=0x0E)
-    # 加密包
-    file.aes_ecb_encryptyion('5A435A66755436363669526467504E48', 0x10)
-    # 从0x04开始计算CRC写入偏移0x00
-    file.crc32_update_revtab(offset=0x00, start=0x04)
-    # 保存
-    file.save(r"C:\Users\tomat\Desktop\1.bin")
-    new_o = file + Bin(bytearray([0xaa]*10), 0xC000)
-    new_o.save(r"C:\Users\tomat\Desktop\2.bin")
+
