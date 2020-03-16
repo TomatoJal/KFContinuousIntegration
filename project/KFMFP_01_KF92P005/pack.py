@@ -6,6 +6,12 @@ import time
 
 
 def pack(config):
+    """
+    pack function for KFMFP_01_KF92P005
+    :param config:
+    :return:
+    """
+    return
     info("Start pack")
     info(f"Project: Camel")
 

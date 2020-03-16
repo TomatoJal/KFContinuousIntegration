@@ -73,7 +73,7 @@ class Bin:
             error("Unknown end")
             return
         info(f"Fill 0xFF until {hex(len(self.content) + fill_length)}")
-        self.content += bytearray([0xff] * fill_length)
+        self.content += bytearray([fill] * fill_length)
 
     def write_length_bytes(self, offset, start=0, bytes_length=4, cover=True):
         """

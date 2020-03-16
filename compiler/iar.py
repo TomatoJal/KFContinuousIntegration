@@ -2,43 +2,63 @@
 import os
 from lxml import etree
 from common import *
+from collections import namedtuple
+
+
+ewp_prj_namedtuple = namedtuple('ewp_prj', 'project exe_path')
+ewp_namedtuple = namedtuple('ewp', 'path ewp_prj')
 
 
 class IARComplier:
-    def __init__(self, IarBuild, prj_path, ewp, project):
-        self.__IarBuild = IarBuild
-        self.__ewp = (prj_path + '/' + ewp).replace('\\', '/') + '.ewp'
-        self.ewp = ewp
-        self.project_name = project
-        self.__IarBuild = self.__IarBuild.replace('\\', '/')
-        # 此处注意调用exe左右加‘“’,否则命令行只会识别到空格
-        self.command = rf'"{self.__IarBuild}/common/bin/IarBuild.exe" {self.__ewp} -commond {self.project_name}'
+    def __init__(self, eww, IarBuild):
+        """
+        解析IAR配置文件
+        :param eww: 项目文件
+        :param IarBuild: 编译命令路径
+        """
+        self.IarBuild = f"\"{IarBuild}\\common\\bin\\IarBuild.exe\""
 
-        # 获取exe位置
-        self.exe_file = None
-        c_file = etree.parse(self.__ewp, etree.HTMLParser())
-        for configuration in c_file.xpath('//project/configuration'):
-            for name in configuration.xpath('./name'):
-                if self.project_name == name.text:
-                    self.exe_file = (prj_path + '/' + configuration.xpath('./settings')[0].xpath('./data/option/state')[0].text).replace('\\', '/') + '/' + self.ewp + '.bin'
-                    break
+        self.__eww = eww
+        self.ewp = {}
+        self.__ws_dir = '\\'.join(self.__eww.split('\\')[:-1])
 
-    def clean(self, need_log=True):
-        info("Start clean~~~~")
-        if need_log is True:
-            info(self.command.replace('commond', 'clean') + " -log all")
-            text = os.popen(self.command.replace('commond', 'clean') + " -log all")
-        else:
-            info(self.command.replace('commond', 'clean'))
-            text = os.popen(self.command.replace('commond', 'clean'))
-        info(text.read())
-        info("Clean end~~~~")
+        # 解析eww
+        c_file = etree.parse(self.__eww, etree.HTMLParser())
+        for project in c_file.xpath('//workspace/project'):
+            ewp_path = project.xpath('./path')[0].text
+            self.ewp[ewp_path.split('\\')[-1].split('.')[0]] = ewp_namedtuple('\\'.join(ewp_path.split('\\')[:-1]),
+                                                                              [])
+
+        # 解析ewp
+        for key in self.ewp.keys():
+            c_file = etree.parse(f"{self.ewp[key].path.replace('$WS_DIR$', self.__ws_dir)}\\{key}.ewp",
+                                 etree.HTMLParser())
+            for configuration in c_file.xpath('//project/configuration'):
+                self.ewp[key].ewp_prj.append(ewp_prj_namedtuple(configuration.xpath('./name')[0].text,
+                                                                configuration.xpath('./settings')[0].xpath('./data')[
+                                                                    0].xpath('./option')[0].xpath('./state')[0].text))
+
+    def clean(self, ewp, log_level='info'):
+        """
+        :param ewp: 待执行ewp
+        :param log_level:
+                None        -   No log
+                'errors'    -   Display build error messages.
+                'warnings'  -   Display build warning and error messages.
+                'info'      -   Display build warning and error messages, and messages
+                                issued by the #pragma message preprocessor directive.
+                'all'       -   Display all messages generated from the build,
+                                for example compiler sign-on information and the
+                                full command line.
+        :return:
+        """
+        info(self.IarBuild)
 
     def build(self, need_log=True):
         info("Start build~~~~")
         self.clean()
         if need_log is True:
-            text = os.popen(self.command.replace('commond', 'build') + " -log all")
+            text = os.popen(self.command.replace('commond', 'build') + " -log info")
         else:
             text = os.popen(self.command.replace('commond', 'build'))
 

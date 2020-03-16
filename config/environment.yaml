@@ -1,8 +1,8 @@
 environment:
     # IAR 软件路径
     IAR_path: {
-      # ver    path
-      '7.40': 'D:\Work\IAR',
-      '8.20': 'D:\Work\IAR8.20',
-      '8.30': 'D:\Work\IAR8.30'
+        # ver  path
+        7.40: 'D:\Work\IAR',
+        8.20: 'D:\Work\IAR8.20',
+        8.30: 'D:\Work\IAR8.30'
     }

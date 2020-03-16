@@ -1,0 +1,29 @@
+config:
+  # 编译器, 可选 IAR, GCC
+  compiler: IAR
+  # AES128 key
+  key: '5A435A66755436363669526467504E48'
+
+
+IAR:
+  # IAR 版本
+  # 可选: 7.40, 8.20, 8.30, 注意带''
+  IAR_ver: 8.20
+  # IAR 项目路径
+  IAR_prj_path: E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\ewarm\ht6x3x
+  # IAR 项目名
+  IAR_prj_name: KFM
+  # 分区起始地址
+  offset: {
+    'boot': 0x00000000,
+    'app1': 0x00004000,
+    'app2': 0x0000C000
+  }
+  # 烧录包组成
+  firmware: {
+      #       boot     app1       app2
+      'SP': ['Debug', 'app1-sp', 'app2-sp'],
+      'PP': ['Debug', 'app1-pp', 'app2-pp'],
+  }
+  # 是否包含其他ewp
+  other: None

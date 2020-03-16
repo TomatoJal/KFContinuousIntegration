@@ -4,7 +4,7 @@ import logging.handlers
 
 class LogConstant:
     """日志模块常量"""
-    LOG_REPORT_FORMAT = '%(asctime)s [%(filename)-20s lineno:%(lineno)-4d] %(levelname)-7s : %(message)s'
+    LOG_REPORT_FORMAT = '%(asctime)s [%(filename)-10s lineno:%(lineno)-4d] %(levelname)-7s : %(message)s'
     # LOG_REPORT_FORMAT = '%(asctime)s : %(message)s'
     LOG_REPORT_PLACEHOLDER = 26
 
