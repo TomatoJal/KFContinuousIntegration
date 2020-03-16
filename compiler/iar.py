@@ -11,7 +11,8 @@ class IARComplier:
         self.ewp = ewp
         self.project_name = project
         self.__IarBuild = self.__IarBuild.replace('\\', '/')
-        self.command = rf"{self.__IarBuild}/common/bin/IarBuild.exe {self.__ewp} -commond {self.project_name}"
+        # 此处注意调用exe左右加‘“’,否则命令行只会识别到空格
+        self.command = rf'"{self.__IarBuild}/common/bin/IarBuild.exe" {self.__ewp} -commond {self.project_name}'
 
         # 获取exe位置
         self.exe_file = None
