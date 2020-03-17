@@ -66,12 +66,26 @@ class Project:
                           self.environment_info['IAR_path'][self.project_info['IAR']['IAR_ver']])
 
         # 检查是否所有打包所需ewp文件都包含且能编译通过
-        for key in config['IAR']['firmware']:
-            for i in range(0, len(config['IAR']['firmware'][key])):
-                pass
+        for prj in config['IAR']['firmware'].keys():
+            for i in range(0, len(config['IAR']['firmware'][prj])):
+                ewp = list(config['IAR']['offset'].keys())[i]
+                if iar.clean(ewp, config['IAR']['firmware'][prj][i]) == -1 or \
+                   iar.build(ewp, config['IAR']['firmware'][prj][i]) == -1:
+                    raise Exception("Build Fail")
 
-        info(config['IAR']['firmware'])
-        info(iar.ewp)
+    def build_project_with_eclipse(self, config):
+        """
+        eclipse编译
+        :param config: 从项目文件夹中获取的配置文件
+        :return: None
+        """
+        # 获取eclipse配置项
+        info("Start analysis eclipse")
+        self.project_info['eclipse'] = config['eclipse']
+        info(f"Use gcc version  -- {self.project_info['eclipse']['gcc_ver']}")
+        info(f"Project path     -- {self.project_info['eclipse']['eclipse_prj_path']}")
+        info(f"eclipse project  -- {self.project_info['eclipse']['eclipse_prj_name']}")
+
 
 
     def build_project(self):
@@ -80,41 +94,22 @@ class Project:
             config = yaml.load(file, Loader=yaml.FullLoader)
             info(f"Compile with -- {config['config']['compiler']}")
             if 'IAR' in config['config']['compiler']:
+                info("Compile start with IAR")
                 self.build_project_with_iar(config)
-                return
 
-
-
-
-
-
-                # 获取每个ewp待编译的项
-                for part in self.project_info['IAR']['compile_prj']:
-                    self.project[part] = {}
-                    self.project_info['bin'][part] = {}
-                    for prj in self.project_info['IAR']['compile_prj'][part]:
-                        self.project[part][prj] = IARComplier(
-                            self.environment_info['IAR_path'][self.project_info['IAR']['IAR_ver']],
-                            self.project_info['IAR']['IAR_prj_path'], part, prj)
-                        if self.basic_info['build'] is True:
-                            if self.project[part][prj].build() == -1:
-                                exit(-1)
-
-                        self.project_info['bin'][part][self.project[part][prj].project_name] = Bin(
-                            self.project[part][prj].exe_file, self.project_info['IAR']['offset'][part])
-            # GCC
-            else:
-                pass
-
-
+            # eclipse
+            if 'eclipse' in config['config']['compiler']:
+                info("Compile start with eclipse")
+                self.build_project_with_eclipse(config)
 
     def main(self):
         # 初始化项目接口
         self.init_project_interface()
 
         # 编译
-        info("Start building project")
-        self.build_project()
+        if self.basic_info['build'] is True:
+            info("Start building project")
+            self.build_project()
 
 
         # 进行打包

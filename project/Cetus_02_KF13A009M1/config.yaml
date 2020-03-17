@@ -1,26 +1,28 @@
 config:
   # 编译器, 可选 IAR, eclipse
-  compiler: eclipse
+  compiler: IAR
 
 IAR:
   # IAR 版本
   # 可选: 7.40, 8.20, 8.30, 注意带''
-  IAR_ver: 8.30
+  IAR_ver: 7.40
   # IAR 项目路径
-  IAR_prj_path: E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\ewarm\ht6x3x
+  IAR_prj_path: E:\OnePiece\Project\0007.KFM\Cetus_02_KF13A009M1\IAR
   # IAR 项目名
-  IAR_prj_name: KFM
+  IAR_prj_name: PRJ
   # 分区起始地址, 分区名应与ewp名字对应
   offset: {
     'boot': 0x00000000,
-    'app1': 0x00004000,
-    'app2': 0x0000C000
+    'app1': 0x00003000,
+    'app2': 0x00013000
   }
   # 烧录包组成
   firmware: {
-      #       boot     app1       app2
-      'SP': ['Debug', 'app1-sp', 'app2-sp'],
-      'PP': ['Debug', 'app1-pp', 'app2-pp'],
+      #            boot     app1          app2
+      'SP':     ['BOOT', 'APP1_SP',    'APP1_SP'],
+      'DC':     ['BOOT', 'APP1_DC',    'APP1_DC'],
+      'CT':     ['BOOT', 'APP1_CT',    'APP1_CT'],
+      'DC100':  ['BOOT', 'APP1_DC100', 'APP1_DC100'],
   }
   # 是否包含其他ewp
   other: None

@@ -6,3 +6,8 @@ environment:
         8.20: 'D:\Work\IAR8.20',
         8.30: 'D:\Work\IAR8.30'
     }
+
+    # GCC 软件路径
+    GCC_path: {
+        '8.1.0': 'D:\Work\mingw64'
+    }

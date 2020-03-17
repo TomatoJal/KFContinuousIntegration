@@ -1,5 +1,5 @@
 config:
-  # 编译器, 可选 IAR, GCC
+  # 编译器, 可选 IAR, eclipse
   compiler: IAR
 
 
