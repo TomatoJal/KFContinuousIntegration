@@ -19,18 +19,12 @@ IAR:
   # 烧录包组成
   firmware: {
       #            boot     app1          app2
-      'SP':     ['BOOT', 'APP1_SP',    'APP1_SP'],
-      'DC':     ['BOOT', 'APP1_DC',    'APP1_DC'],
-      'CT':     ['BOOT', 'APP1_CT',    'APP1_CT'],
-      'DC100':  ['BOOT', 'APP1_DC100', 'APP1_DC100'],
+      'SP':     ['BOOT', 'APP1_SP',    'APP2_SP'],
+      'DC':     ['BOOT', 'APP1_DC',    'APP2_DC'],
+      'CT':     ['BOOT', 'APP1_CT',    'APP2_CT'],
+      'DC100':  ['BOOT', 'APP1_DC100', 'APP2_DC100'],
   }
   # 是否包含其他ewp
   other: None
 
-eclipse:
-  # GCC 版本
-  gcc_ver: '8.1.0'
-  # eclipse 项目名
-  eclipse_prj_name: .cprojrct
-  # eclipse 工程路径, 对应.cprojrct所处位置
-  eclipse_prj_path: E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\eclipse\
+eclipse: None

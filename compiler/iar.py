@@ -76,7 +76,7 @@ class IARComplier:
         info(command)
         content = os.popen(command).read()
         info(content)
-        if content.find("ERROR, Command failed") != -1:
+        if content.find("ERROR") != -1:
             error(f"Clean {ewp} {project} Failed!")
             return -1
         else:
@@ -106,7 +106,7 @@ class IARComplier:
         info(command)
         content = os.popen(command).read()
         info(content)
-        if content.find("ERROR, Command failed") != -1:
+        if content.find("ERROR") != -1:
             error(f"Build {ewp} {project} Failed!")
             return -1
         else:
