@@ -4,7 +4,7 @@ config:
 
 IAR:
   # IAR 版本
-  # 可选: 7.40, 8.20, 8.30, 注意带''
+  # 可选: 7.40, 8.20, 8.30
   IAR_ver: 8.30
   # IAR 项目路径
   IAR_prj_path: E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\ewarm\ht6x3x
@@ -26,9 +26,13 @@ IAR:
   other: None
 
 eclipse:
+  # IDE
+  IDE: eclipse
   # GCC 版本
-  gcc_ver: '8.1.0'
+  GCC_ver: '8.1.0'
   # eclipse 项目名
   eclipse_prj_name: .cprojrct
   # eclipse 工程路径, 对应.cprojrct所处位置
   eclipse_prj_path: E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\eclipse\
+  # configuration
+  configuration: ['Debug']
