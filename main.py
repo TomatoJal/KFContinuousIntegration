@@ -4,10 +4,10 @@ from compiler import *
 from pack import *
 import yaml
 import os
-import shutil
 import traceback
 import sys
 from common import *
+import time
 
 
 class Project:
@@ -22,7 +22,6 @@ class Project:
         self.environment_info = {}  # 环境信息, 取自environment.yaml为文件
 
         self.project_info = {}
-        self.project_info.update({'bin': {}})
 
         self.project = {}
         self.interface = {
@@ -71,9 +70,8 @@ class Project:
         for prj in self.project_info['IAR']['firmware'].keys():
             for i in range(0, len(self.project_info['IAR']['firmware'][prj])):
                 ewp = list(self.project_info['IAR']['offset'].keys())[i]
-                if iar.clean(ewp, self.project_info['IAR']['firmware'][prj][i]) == -1 or \
-                   iar.build(ewp, self.project_info['IAR']['firmware'][prj][i]) == -1:
-                    raise Exception("Build Fail")
+                if iar.build(ewp, self.project_info['IAR']['firmware'][prj][i]) == -1:
+                    raise Exception(f"Build {ewp} Fail")
 
     def build_project_with_eclipse(self):
         """
@@ -88,7 +86,6 @@ class Project:
         gcc = GCCComplier(self.project_info['eclipse'],
                           self.environment_info['GCC_path'][self.project_info['eclipse']['GCC_ver']])
 
-
     def build_project(self):
         # 获取项目配置, 并编译
         info(f"Compile with -- {self.project_info['config']['compiler']}")
@@ -101,6 +98,47 @@ class Project:
             info("Compile start with eclipse")
             self.build_project_with_eclipse()
 
+    def pack_project(self):
+        if 'IAR' not in self.project_info['config']['compiler']:
+            raise Exception("Pack needs IAR, please config the compiler: -> IAR")
+        # 获取bin文件
+        iar = IARComplier(f"{self.project_info['IAR']['IAR_prj_path']}\\"
+                          f"{self.project_info['IAR']['IAR_prj_name']}.eww",
+                          self.environment_info['IAR_path'][self.project_info['IAR']['IAR_ver']])
+        for key in self.project_info['IAR']['firmware'].keys():
+            for i in range(0, len(self.project_info['IAR']['offset'])):
+                ewp = list(self.project_info['IAR']['offset'].keys())[i]
+                bin_path = f"{iar.ewp[ewp].path.replace('$WS_DIR$', self.project_info['IAR']['IAR_prj_path'])}\\" \
+                           f"{iar.ewp[ewp].ewp_prj[self.project_info['IAR']['firmware'][key][i]]}\\" \
+                           f"{ewp}.bin"
+                self.project_info['IAR']['firmware'][key][i] = Bin(bin_path, self.project_info['IAR']['offset'][ewp],
+                                                                   ewp)
+
+        # 执行打包, 创建临时文件夹
+        self.interface['pack'].tmp_path = f"./temp/{self.interface['pack'].tag[0]}_" \
+                                          f"({time.strftime('%Y_%m_%d_%H_%M_%S', time.localtime())})"
+        os.makedirs(self.interface['pack'].tmp_path)
+        self.interface['pack'](self.project_info['IAR']['firmware'])
+
+        # 保存
+        item_path = f"{self.basic_info['release_path']}\\{self.basic_info['project_name']}"
+        if os.path.exists(item_path) is False:
+            os.makedirs(item_path)
+        if self.basic_info['sample'] is not None:
+            self.interface['save'].tag = [self.basic_info['sample']]
+            sample_path = f"{self.basic_info['release_path']}\\{self.basic_info['project_name']}\\" \
+                          f"Sample_{self.basic_info['sample']}"
+            if os.path.exists(sample_path) is False:
+                os.makedirs(sample_path)
+        else:
+            sample_path = f"{self.basic_info['release_path']}\\{self.basic_info['project_name']}\\" \
+                          f"{self.basic_info['project_name']}"
+            if os.path.exists(sample_path) is False:
+                os.makedirs(sample_path)
+        self.interface['save'].tmp_path = self.interface['pack'].tmp_path
+        self.interface['save'].release_ver = self.interface['pack'].release_ver
+        self.interface['save'](sample_path)
+
     def main(self):
         # 初始化项目接口
         self.init_project()
@@ -110,10 +148,9 @@ class Project:
             self.build_project()
 
         # 进行打包
-        # 获取bin文件
-        # if self.basic_info['pack'] is True:
-            # self.interface['pack']()
-            # self.interface['save']()
+        if self.basic_info['pack'] is True:
+            info("Start packing project")
+            self.pack_project()
 
 
 if __name__ == '__main__':
@@ -132,9 +169,9 @@ if __name__ == '__main__':
         parser.error("'project' argument is needed!")
 
     # 清理临时文件夹
-    if os.path.exists('./temp') is True:
-        shutil.rmtree('./temp')
-    os.makedirs('./temp')
+    # if os.path.exists('./temp') is True:
+    #     shutil.rmtree('./temp')
+    # os.makedirs('./temp')
 
     # 创建项目对象, 构建基础信息
     project = Project()
@@ -151,8 +188,9 @@ if __name__ == '__main__':
 
     # 读取全局配置文集
     with open(r'config\environment.yaml', encoding="utf-8") as f:
-        project.environment_info = yaml.load(f, Loader=yaml.FullLoader)['environment']
-
+        c = yaml.load(f, Loader=yaml.FullLoader)
+        project.environment_info = c['environment']
+        project.basic_info['release_path'] = c['release_path']
     info('*' * 80)
     info('*' * 37 + 'STARTS' + '*' * 37)
     info('*' * 80)

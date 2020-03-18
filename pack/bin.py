@@ -8,7 +8,7 @@ from struct import *
 
 
 class Bin:
-    def __init__(self, f, offset):
+    def __init__(self, f, offset, name=None):
         if isinstance(f, bytearray) is False and isinstance(f, bytes) is False:
             info(f"Open file {f}")
             self.source = bytearray(open(f, 'rb').read())
@@ -16,6 +16,7 @@ class Bin:
             self.source = bytearray(f)
         self.content = bytearray(self.source)
         self.offset = offset
+        self.name = name
 
     def __add__(self, other):
         new_obj = None
@@ -72,7 +73,7 @@ class Bin:
         else:
             error("Unknown end")
             return
-        info(f"Fill 0xFF until {hex(len(self.content) + fill_length)}")
+        info(f"Fill {hex(fill)} until {hex(len(self.content) + fill_length)}")
         self.content += bytearray([fill] * fill_length)
 
     def write_length_bytes(self, offset, start=0, bytes_length=4, cover=True):

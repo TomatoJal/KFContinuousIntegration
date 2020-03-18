@@ -11,3 +11,5 @@ environment:
     GCC_path: {
         '8.1.0': 'D:\Work\mingw64'
     }
+
+release_path: E:\DownLoad\release

@@ -2,7 +2,6 @@ config:
   # 编译器, 可选 IAR, eclipse
   compiler: IAR
 
-
 IAR:
   # IAR 版本
   # 可选: 7.40, 8.20, 8.30
@@ -11,19 +10,19 @@ IAR:
   IAR_prj_path: E:\OnePiece\Project\0007.KFM\Camel_01_KF13A017_DC_PP\Prj_IAR
   # IAR 项目名
   IAR_prj_name: CAMEL
-  # 烧录包组成
-  firmware: {
-      #            boot         app1             app2
-      '100A-DC': ['Debug', 'Legal-100A-DC', 'App-100A-DC'],
-      '160A-DC': ['Debug', 'Legal-160A-DC', 'App-160A-DC'],
-      'PPCT-CT': ['Debug', 'Legal-PPCT-CT', 'App-PPCT-CT'],
-      'CTVT-CT': ['Debug', 'Legal-CTVT-CT', 'App-CTVT-CT']
-  }
   # 分区起始地址
   offset: {
       'boot': 0x00000000,
       'app1': 0x00004000,
       'app2': 0x0000C000
+  }
+  # 烧录包组成
+  firmware: {
+    #            boot         app1             app2
+    '100A-DC': ['Debug', 'Legal-100A-DC', 'App-100A-DC'],
+    '160A-DC': ['Debug', 'Legal-160A-DC', 'App-160A-DC'],
+    'PPCT-CT': ['Debug', 'Legal-PPCT-CT', 'App-PPCT-CT'],
+    'CTVT-CT': ['Debug', 'Legal-CTVT-CT', 'App-CTVT-CT']
   }
   # 是否包含其他ewp
   other: None
