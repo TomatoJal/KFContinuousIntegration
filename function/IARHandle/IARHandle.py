@@ -3,6 +3,7 @@ from lxml import etree
 from collections import namedtuple
 from common.logHandle import *
 import subprocess
+import os
 
 
 def icf_file_analysis(file: str) -> list:
@@ -142,7 +143,7 @@ class IAR:
         for key in self.eww.batchBuild.keys():
             info(batch_mat.format(key, *self.eww.batchBuild[key]))
 
-    def build(self, configuration, action='build', log_level='info', varfile=None, output=None):
+    def build(self, configuration, action='make', log_level='info', varfile=None, output=None):
         """
         Usage: iarbuild
                     <projectfile> [-clean | -build | -make | -cstat_analyze | -cstat_clean]
@@ -160,28 +161,44 @@ class IAR:
             error("Known log level")
             return
 
+        member = {}
         info(f"Start Build {configuration}")
         for ewp in self.eww.batchBuild[configuration]._fields:
-            command = f"\"{self.IarBuild}\" \"{self.ewp[ewp].ewp_path}\" -{action} {self.eww.batchBuild[configuration].__getattribute__(ewp)} -log {log_level}"
-
+            config = self.eww.batchBuild[configuration].__getattribute__(ewp)
+            command = f"\"{self.IarBuild}\" \"{self.ewp[ewp].ewp_path}\" -{action} {config} -log {log_level}"
+            member[config] = self.ewp[ewp].configuration[config]
             if output is not None:
                 file = open(f"{output}/{ewp}.txt", 'w')
             info("{:10}--\t{}".format("Start Build", command))
+            # 编译抓取log
             p = subprocess.Popen(command, stdout=subprocess.PIPE)
-            out, err = p.communicate()
-            for line in out.splitlines():
+            result = p.wait()
+
+            for line in p.stdout.readlines():
                 msg = line.decode("gbk", "ignore")
                 info(msg)
                 if output is not None:
-                    file.write(msg + '\n')
+                    file.write(msg)
             if output is not None:
                 file.close()
                 info(f"Log write to file {output}\\{ewp}.txt")
+
+            if result == 0:
+                info(f"Build {config} Successful !")
+            else:
+                info(f"Build {config} Failed !")
+                return None
+
+        info(f"Build {configuration} Successful !")
+        return member
+
+
+
 
 
 if __name__ == "__main__":
     iar = IAR(r'E:\OnePiece\Project\0007.KFM\Cetus_02_KF13A009M1\IAR\PRJ.eww', r'D:\Work\IAR\common\bin\IarBuild.exe')
     iar.print_info()
-    iar.build('Debug_sp', output='E:\work')
+    print(iar.build('Debug_sp'))
     # iar = IAR(r'E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\ewarm\ht6x3x\KFM.eww')
     # print(iar.__dict__)

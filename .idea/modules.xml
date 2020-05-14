@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../IDISfromDZ/.idea/IDISfromDZ.iml" filepath="$PROJECT_DIR$/../IDISfromDZ/.idea/IDISfromDZ.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/KFContinuousIntegration.iml" filepath="$PROJECT_DIR$/.idea/KFContinuousIntegration.iml" />
       <module fileurl="file://$PROJECT_DIR$/../KFContinuousIntegration2/.idea/KFContinuousIntegration2.iml" filepath="$PROJECT_DIR$/../KFContinuousIntegration2/.idea/KFContinuousIntegration2.iml" />
     </modules>
