@@ -1,6 +1,6 @@
 config:
   # IAR 版本
   # 可选: 7.40, 8.20, 8.30, 注意带''
-  IAR_ver: '8.30'
+  IAR_ver: '7.40'
   # IAR 项目路径, xxx.ewp文件所处位置
-  eww_path: E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\ewarm\ht6x3x\KFM.eww
+  eww_path: E:\OnePiece\Project\0007.KFM\Cetus_02_KF13A009M1\IAR\PRJ.eww

@@ -2,14 +2,12 @@ environment:
     # IAR 软件路径
     IAR_path: {
         # ver  path
-        7.40: 'D:\Work\IAR',
-        8.20: 'D:\Work\IAR8.20',
-        8.30: 'D:\Work\IAR8.30'
+        iar7.4: 'D:\Work\IAR',
+        iar8.2: 'D:\Work\IAR8.20',
+        iar8.3: 'D:\Work\IAR8.30'
     }
 
     # GCC 软件路径
     GCC_path: {
         '8.1.0': 'D:\Work\mingw64'
     }
-
-release_path: E:\DownLoad\release

@@ -1,2 +1,1 @@
-from .log import *
-from .decorate import *
+from .logHandle import *

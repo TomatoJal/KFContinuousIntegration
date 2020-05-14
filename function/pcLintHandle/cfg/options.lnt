@@ -1,0 +1,39 @@
+// Please note -- this is a representative set of error suppression
+//                options.  Please adjust to suit your own policies
+//                See  manual (chapter LIVING WITH LINT)
+//                for further details.
+
+-e413       // Likely use of null pointer 'pxQueue' in left argument to operator '->'
+-e430       // Character '@', taken to specify location or a mask, is not standard C/C++
+-e641       // Converting enum 'xxx' to 'int'
+-e688       // Cast used within a preprocessor conditional statement
+-e701       // Shift left of signed quantity (int)
+-e715       // Symbol 'xxx' not referenced [MISRA 2012 Rule 2.7, advisory]
+-e718       // allow calls to undeclared C functions
+-e749       // 749: local enumeration constant 'xxx' not referenced
+-e750       // local macro 'xxx' not referenced [MISRA 2012 Rule 2.5, advisory]
+-e765       // external 'xxx' could be made static     [MISRA 2012 Rule 8.7, advisory]
+-e778       // Constant expression evaluates to 0 in operation: ¡¯String¡¯
+-e793       // ANSI/ISO limit of 31 'significant characters
+-e818       // Pointer parameter 'xxxx' could be declared as pointing to const
+//-e826     // uspicious pointer-to-pointer conversion (area too small)
+-e835       // A zero has been given as [left/right] argument to operator 'Name'
+//-e838     // Previously assigned value to variable 'RetBit' has not been used
+-e843       // Variable 'xxxx' could be declared as const
+-e845       // The right argument to operator '+' is certain to be 0
+-e904       // Return statement before end of function [MISRA 2012 Rule 15.5, advisory]
+-e923       // cast from unsigned long to pointer [MISRA 2012 Rule 11.6, required]
+-e954       // Pointer variable 'xxx' could be declared as pointing to const [MISRA 2012 Rule 8.13, advisory]
+-e9003      // could define variable 'xxx' at block scope [MISRA 2012 Rule 8.9, advisory]
+-e9011      // more than one 'break' terminates loop [MISRA 2012 Rule 15.4, advisory]
+-e9016      // pointer arithmetic other than array indexing used [MISRA 2012 Rule 18.4, advisory]
+-e9018      // declaration of union type or object of union type, 'union {...}' [MISRA 2012 Rule 19.2, advisory]
+-e9026      // Function-like macro, [MISRA 2012 Directive 4.9, advisory]
+-e9029      // Mismatched essential type categories for binary operator
+-e9030      // Impermissible cast; cannot cast from 'essentially signed' to 'essentially Boolean' [MISRA 2012 Rule 10.5, advisory]
+//-e9044    // function  parameter modified [MISRA 2012 Rule 17.8, advisory]
+-e9050      // dependence placed on C/C++ operator precedence; operators '*' and '+' [MISRA 2012 Rule 12.1, advisory]
+-e9058      // tag 'xxxx' unused outside of typedefs   [MISRA 2012 Rule 2.4, advisory]
+-e9078     // conversion between a pointer and integer type   [MISRA 2012 Rule 11.4, advisory]
+//-e9087    // cast performed between a pointer to object type and a pointer to a different object type [MISRA 2012 Rule 11.3, required]
+

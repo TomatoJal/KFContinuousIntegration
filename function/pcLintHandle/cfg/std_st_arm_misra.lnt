@@ -1,0 +1,8 @@
+//  IAR C, -si4 -sp4, 
+//  Standard lint options
+
+E:\OnePiece\Project\0007.KFM\KFContinuousIntegration\PCLint\cfg\au-misra3.lnt
+E:\OnePiece\Project\0007.KFM\KFContinuousIntegration\PCLint\cfg\co-iar.lnt
+
++rw(__intrinsic)
++rw(__nounwind)
