@@ -84,10 +84,14 @@ class EWP:
                                                            './settings/data/option[name="CCIncludePath2"]/state/text()')]
             self.configuration[name].CCDefines = [d for d in configuration.xpath(
                 './settings/data/option[name="CCDefines"]/state/text()')]
-            self.configuration[name].IlinkIcfFile = [f.replace('$PROJ_DIR$', self.PROJ_DIR) for f in
-                                                     configuration.xpath(
-                                                         './settings/data/option[name="IlinkIcfFile"]/state/text()')][0]
-            self.configuration[name].range = icf_file_analysis(self.configuration[name].IlinkIcfFile)
+            try:
+                self.configuration[name].IlinkIcfFile = [f.replace('$PROJ_DIR$', self.PROJ_DIR) for f in
+                                                         configuration.xpath(
+                                                             './settings/data/option[name="IlinkIcfFile"]/state/text()')][0]
+                self.configuration[name].range = icf_file_analysis(self.configuration[name].IlinkIcfFile)
+            except:
+                self.configuration[name].IlinkIcfFile = None
+                self.configuration[name].range = [0, 0]
 
 class EWW:
     def __init__(self, eww: str):
@@ -109,7 +113,8 @@ class EWW:
     def _project_analysis(self):
         # 获取所有ewp文件
         for ewp in self.__eww_parse.xpath('//workspace/project/path/text()'):
-            self.project[ewp.split('\\')[-1][:-4]] = ewp.replace('$WS_DIR$', self.WS_DIR)
+            if os.path.exists(ewp.replace('$WS_DIR$', self.WS_DIR)) is True:
+                self.project[ewp.split('\\')[-1][:-4]] = ewp.replace('$WS_DIR$', self.WS_DIR)
 
     def _batchBuild_analysisi(self):
         try:
