@@ -21,15 +21,16 @@ def icf_file_analysis(file: str) -> list:
                     var += line[i].replace(';', '').replace('\n', '')
                     if ';' in line[i]:
                         break
-
                     var = eval(var)
                     locals()[varName] = var
+
                 if varName in ['__ICFEDIT_region_ROM_start__', 'FLASH_START', 'ROM_start__']:
                     start = var
                 elif varName in ['__ICFEDIT_region_ROM_end__', 'FLASH_END', 'ROM_end__']:
                     end = var
         return [start, end]
-    except:
+    except Exception as e:
+        print(e)
         pass
 
 
@@ -135,6 +136,12 @@ class IAR:
         self.ewp = {}
         for key in self.eww.project.keys():
             self.ewp[key] = EWP(self.eww.project[key])
+        self.__batchDefinition_generate()
+
+    def __batchDefinition_generate(self):
+        self.batch = {}
+        for key in self.eww.batchBuild:
+            self.batch[key] = _Batch()
 
     def print_info(self):
         mat = "{:10}--\t{}"
@@ -147,6 +154,8 @@ class IAR:
         info(batch_mat.format("batchDefinition", *self.ewp.keys()))
         for key in self.eww.batchBuild.keys():
             info(batch_mat.format(key, *self.eww.batchBuild[key]))
+            all_range = []
+
 
     def build(self, configuration, action='make', log_level='info', varfile=None, output=None):
         """
@@ -155,15 +164,15 @@ class IAR:
                     <config> [-log errors|warnings|info|all] [-parallel <number>] [-varfile <argvarfile>]
         """
         if configuration not in self.eww.batchBuild.keys():
-            error("Known configuration")
+            error("Unknown configuration")
             return
 
         if action not in ['clean', 'build', 'make', 'cstat_analyze', 'cstat_clean']:
-            error("Known action")
+            error("Unknown action")
             return
 
         if log_level not in ['errors', 'warnings', 'info', 'all']:
-            error("Known log level")
+            error("Unknown log level")
             return
 
         member = {}
@@ -181,7 +190,7 @@ class IAR:
 
             for line in p.stdout.readlines():
                 msg = line.decode("gbk", "ignore")
-                info(msg)
+                info(msg.replace('\n', ''))
                 if output is not None:
                     file.write(msg)
             if output is not None:
@@ -204,6 +213,6 @@ class IAR:
 if __name__ == "__main__":
     iar = IAR(r'E:\OnePiece\Project\0007.KFM\Cetus_02_KF13A009M1\IAR\PRJ.eww', r'D:\Work\IAR\common\bin\IarBuild.exe')
     iar.print_info()
-    print(iar.build('Debug_sp'))
+    # print(iar.build('Debug_sp'))
     # iar = IAR(r'E:\OnePiece\Project\0007.KFM\KFMFP-01-KF92P005\software\ewarm\ht6x3x\KFM.eww')
     # print(iar.__dict__)
